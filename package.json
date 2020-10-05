@@ -235,10 +235,14 @@
     },
     "main": "./dist/extension",
     "scripts": {
+        "vscode:prepublish": "webpack --mode production",
         "compile": "webpack --mode none",
         "watch": "webpack --mode none --watch --info-verbosity verbose",
         "postinstall": "node ./node_modules/vscode/bin/install",
         "update-version": "node ./scripts/update-version.js",
+        "test-compile": "tsc -p ./",
+        "test": "npm run test-compile && node ./node_modules/vscode/bin/test",
+        "test-coverage": "cross-env COVER_CONFIG=html npm run test",
         "package": "vsce package",
         "build-tm-grammar": "js-yaml grammar/ballerina-grammar/syntaxes/ballerina.tmLanguage.yaml > grammar/ballerina-grammar/syntaxes/ballerina.tmLanguage.json"
     },
