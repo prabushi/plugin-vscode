@@ -1,0 +1,33 @@
+[project]
+org-name = "ballerina"
+version = "0.5.1"
+
+[dependencies]
+"ballerina/stringutils" = "0.5.0"
+"ballerina/runtime" = "0.5.0"
+"ballerina/time" = "1.0.1"
+
+[platform]
+target = "java8"
+
+    [[platform.libraries]]
+    artifactId = "file"
+    version = "0.5.1"
+    path = "../file-native/build/libs/file-native-0.5.1.jar"
+    groupId = "ballerina"
+    modules = ["file"]
+
+    [[platform.libraries]]
+    artifactId = "org.wso2.transport.local-file-system"
+    version = "6.0.55"
+    path = "./lib/org.wso2.transport.local-file-system-6.0.55.jar"
+    groupId = "org.wso2.transport.file"
+    modules = ["file"]
+
+    [[platform.libraries]]
+    artifactId = "file"
+    version = "0.5.1"
+    path = "../file-test-utils/build/libs/file-test-utils-0.5.1.jar"
+    groupId = "org.ballerinalang.stdlib.file"
+    modules = ["file"]
+    scope = "testOnly"

@@ -1,0 +1,28 @@
+[project]
+org-name = "ballerinax"
+version = "1.0.3"
+
+[dependencies]
+"ballerina/crypto" = "1.0.0"
+"ballerina/log" = "1.0.0"
+"ballerina/time" = "1.0.1"
+"ballerina/system" = "0.6.0"
+"ballerina/runtime" = "0.5.0"
+"ballerina/io" = "0.5.0"
+
+[platform]
+target = "java8"
+
+    [[platform.libraries]]
+    artifactId = "amqp-client"
+    version = "5.7.3"
+    path = "./lib/amqp-client-5.7.3.jar"
+    groupId = "com.rabbitmq"
+    modules = ["rabbitmq"]
+
+    [[platform.libraries]]
+    artifactId = "rabbitmq"
+    version = "1.0.3"
+    path = "../rabbitmq-native/build/libs/rabbitmq-native-1.0.3.jar"
+    groupId = "ballerina"
+    modules = ["rabbitmq"]

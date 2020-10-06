@@ -1,0 +1,186 @@
+[project]
+org-name = "ballerina"
+version = "1.0.2"
+
+[dependencies]
+"ballerina/http" = "1.0.0"
+"ballerina/mime" = "1.0.0"
+"ballerina/auth" = "1.0.0"
+"ballerina/file" = "0.5.1"
+"ballerina/cache" = "2.0.0"
+"ballerina/crypto" = "1.0.0"
+"ballerina/encoding" = "1.0.2"
+"ballerina/task" = "1.1.0"
+"ballerina/log" = "1.0.0"
+"ballerina/time" = "1.0.1"
+"ballerina/reflect" = "0.5.0"
+"ballerina/runtime" = "0.5.0"
+"ballerina/system" = "0.6.0"
+"ballerina/config" = "1.0.0"
+"ballerina/io" = "0.5.0"
+"ballerina/stringutils" = "0.5.0"
+
+[platform]
+target = "java8"
+
+    [[platform.libraries]]
+    artifactId = "web-sub"
+    version = "1.0.2"
+    path = "../websub-native/build/libs/websub-native-1.0.2.jar"
+    groupId = "ballerina"
+    modules = ["websub"]
+
+    [[platform.libraries]]
+    artifactId = "org.wso2.transport.http.netty"
+    version = "6.3.11"
+    path = "./lib/org.wso2.transport.http.netty-6.3.11.jar"
+    groupId = "org.wso2.transport.http"
+    modules = ["websub"]
+
+    [[platform.libraries]]
+    artifactId = "netty-common"
+    version = "4.1.39.Final"
+    path = "./lib/netty-common-4.1.39.Final.jar"
+    groupId = "io.netty"
+    modules = ["websub"]
+
+    [[platform.libraries]]
+    artifactId = "netty-buffer"
+    version = "4.1.39.Final"
+    path = "./lib/netty-buffer-4.1.39.Final.jar"
+    groupId = "io.netty"
+    modules = ["websub"]
+
+    [[platform.libraries]]
+    artifactId = "netty-transport"
+    version = "4.1.39.Final"
+    path = "./lib/netty-transport-4.1.39.Final.jar"
+    groupId = "io.netty"
+    modules = ["websub"]
+
+    [[platform.libraries]]
+    artifactId = "netty-resolver"
+    version = "4.1.39.Final"
+    path = "./lib/netty-resolver-4.1.39.Final.jar"
+    groupId = "io.netty"
+    modules = ["websub"]
+
+    [[platform.libraries]]
+    artifactId = "netty-handler"
+    version = "4.1.39.Final"
+    path = "./lib/netty-handler-4.1.39.Final.jar"
+    groupId = "io.netty"
+    modules = ["websub"]
+
+    [[platform.libraries]]
+    artifactId = "netty-codec-http"
+    version = "4.1.39.Final"
+    path = "./lib/netty-codec-http-4.1.39.Final.jar"
+    groupId = "io.netty"
+    modules = ["websub"]
+
+    [[platform.libraries]]
+    artifactId = "netty-codec"
+    version = "4.1.39.Final"
+    path = "./lib/netty-codec-4.1.39.Final.jar"
+    groupId = "io.netty"
+    modules = ["websub"]
+
+    [[platform.libraries]]
+    artifactId = "netty-handler-proxy"
+    version = "4.1.39.Final"
+    path = "./lib/netty-handler-proxy-4.1.39.Final.jar"
+    groupId = "io.netty"
+    modules = ["websub"]
+
+    [[platform.libraries]]
+    artifactId = "netty-codec-http2"
+    version = "4.1.39.Final"
+    path = "./lib/netty-codec-http2-4.1.39.Final.jar"
+    groupId = "io.netty"
+    modules = ["websub"]
+
+    [[platform.libraries]]
+    artifactId = "commons-pool"
+    version = "1.5.6.wso2v1"
+    path = "./lib/commons-pool-1.5.6.wso2v1.jar"
+    groupId = "commons-pool.wso2"
+    modules = ["websub"]
+
+    [[platform.libraries]]
+    artifactId = "snakeyaml"
+    version = "1.16.0.wso2v1"
+    path = "./lib/snakeyaml-1.16.0.wso2v1.jar"
+    groupId = "org.wso2.orbit.org.yaml"
+    modules = ["websub"]
+
+    [[platform.libraries]]
+    artifactId = "bcprov-jdk15on"
+    version = "1.61"
+    path = "./lib/bcprov-jdk15on-1.61.jar"
+    groupId = "org.bouncycastle"
+    modules = ["websub"]
+
+    [[platform.libraries]]
+    artifactId = "bcpkix-jdk15on"
+    version = "1.61"
+    path = "./lib/bcpkix-jdk15on-1.61.jar"
+    groupId = "org.bouncycastle"
+    modules = ["websub"]
+
+    [[platform.libraries]]
+    artifactId = "netty-tcnative-boringssl-static"
+    version = "2.0.25.Final"
+    path = "./lib/netty-tcnative-boringssl-static-2.0.25.Final.jar"
+    groupId = "io.netty"
+    modules = ["websub"]
+
+    [[platform.libraries]]
+    artifactId = "broker-core"
+    version = "0.970.5"
+    path = "./lib/broker-core-0.970.5.jar"
+    groupId = "io.ballerina.messaging"
+    modules = ["websub"]
+
+    [[platform.libraries]]
+    artifactId = "broker-common"
+    version = "0.970.0"
+    path = "./lib/broker-common-0.970.0.jar"
+    groupId = "io.ballerina.messaging"
+    modules = ["websub"]
+
+    [[platform.libraries]]
+    artifactId = "broker-auth"
+    version = "0.970.0"
+    path = "./lib/broker-auth-0.970.0.jar"
+    groupId = "io.ballerina.messaging"
+    modules = ["websub"]
+
+    [[platform.libraries]]
+    artifactId = "broker-rest-runner"
+    version = "0.970.0"
+    path = "./lib/broker-rest-runner-0.970.0.jar"
+    groupId = "io.ballerina.messaging"
+    modules = ["websub"]
+
+    [[platform.libraries]]
+    artifactId = "broker-coordination"
+    version = "0.970.0"
+    path = "./lib/broker-coordination-0.970.0.jar"
+    groupId = "io.ballerina.messaging"
+    modules = ["websub"]
+
+    [[platform.libraries]]
+    artifactId = "org.wso2.carbon.metrics.core"
+    version = "2.3.7"
+    path = "./lib/org.wso2.carbon.metrics.core-2.3.7.jar"
+    groupId = "org.wso2.carbon.metrics"
+    modules = ["websub"]
+
+    [[platform.libraries]]
+    artifactId = "guava"
+    version = "19.0"
+    path = "./lib/guava-19.0.jar"
+    groupId = "com.google.guava"
+    modules = ["websub"]
+

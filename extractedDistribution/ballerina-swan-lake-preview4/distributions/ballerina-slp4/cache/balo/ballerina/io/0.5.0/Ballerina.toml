@@ -1,0 +1,22 @@
+[project]
+org-name = "ballerina"
+version = "0.5.0"
+
+[platform]
+target = "java8"
+
+    [[platform.libraries]]
+    artifactId = "io"
+    version = "0.5.0"
+    path = "../io-native/build/libs/io-native-0.5.0.jar"
+    groupId = "ballerina"
+    modules = ["io"]
+
+    [[platform.libraries]]
+    artifactId = "io"
+    version = "0.5.0"
+    path = "../io-test-utils/build/libs/io-test-utils-0.5.0.jar"
+    groupId = "org.ballerinalang.stdlib.io"
+    modules = ["io"]
+    scope = "testOnly"
+    

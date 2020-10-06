@@ -1,0 +1,29 @@
+[project]
+org-name = "ballerina"
+version = "0.7.1"
+
+[dependencies]
+"ballerina/stringutils" = "0.5.0"
+"ballerina/io" = "0.5.0"
+"ballerina/log" = "1.0.0"
+"ballerina/system" = "0.6.0"
+"ballerina/file" = "0.5.1"
+"ballerina/time" = "1.0.1"
+
+[platform]
+target = "java8"
+
+    [[platform.libraries]]
+    artifactId = "filepath"
+    version = "0.7.1"
+    path = "../filepath-native/build/libs/filepath-native-0.7.1.jar"
+    groupId = "ballerina"
+    modules = ["filepath"]
+
+    [[platform.libraries]]
+    artifactId = "filepath"
+    version = "0.7.1"
+    path = "../filepath-test-utils/build/libs/filepath-test-utils-0.7.1.jar"
+    groupId = "org.ballerinalang.stdlib.filepath"
+    modules = ["filepath"]
+    scope = "testOnly"

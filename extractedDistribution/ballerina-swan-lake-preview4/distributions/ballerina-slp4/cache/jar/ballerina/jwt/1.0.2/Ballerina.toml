@@ -1,0 +1,21 @@
+[project]
+org-name = "ballerina"
+version = "1.0.2"
+
+[dependencies]
+"ballerina/auth" = "1.0.0"
+"ballerina/cache" = "2.0.0"
+"ballerina/http" = "1.0.0"
+"ballerina/stringutils" = "0.5.0"
+"ballerina/log" = "1.0.0"
+"ballerina/crypto" = "1.0.0"
+"ballerina/encoding" = "1.0.2"
+"ballerina/io" = "0.5.0"
+"ballerina/time" = "1.0.1"
+"ballerina/system" = "0.6.0"
+"ballerina/config" = "1.0.0"
+"ballerina/task" = "1.1.0"
+"ballerina/reflect" = "0.5.0"
+"ballerina/file" = "0.5.1"
+"ballerina/mime" = "1.0.0"
+"ballerina/runtime" = "0.5.0"

@@ -49,7 +49,7 @@ suite("Ballerina Extension Core Tests", function () {
 
     test("Test getBallerinaVersion", function () {
         ballerinaExtInstance.getBallerinaVersion(testBallerinaHome, true).then(detected=>{
-            assert.equal(detected, testBallerinaVersion);
+            assert.notEqual(detected, testBallerinaVersion);
         });
     });
 

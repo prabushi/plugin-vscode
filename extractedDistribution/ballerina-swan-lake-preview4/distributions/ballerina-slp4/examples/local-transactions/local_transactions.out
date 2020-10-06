@@ -1,0 +1,7 @@
+# To run this sample, navigate to the directory that contains the
+# `.bal` file, and execute the `ballerina run` command below.
+ballerina run local_transactions.bal
+Transaction Info: {"xid":[51,97,99,100,97,49,101,48,45,102,98,97,54,45,52,52,54,51,45,57,55,52,54,45,56,49,97,55,53,51,57,52,52,50,101,99],"retryNumber":0,"startTime":1600688660802,"prevAttempt":null}
+Transaction committed
+Account Credit: {"affectedRowCount":1,"lastInsertId":null}
+Account Debit: {"affectedRowCount":1,"lastInsertId":null}

@@ -1,0 +1,21 @@
+[project]
+org-name = "ballerina"
+version = "1.0.0"
+
+[platform]
+target = "java8"
+
+    [[platform.libraries]]
+    artifactId = "jsonutils"
+    version = "1.0.0"
+    path = "../jsonutils-native/build/libs/jsonutils-native-1.0.0.jar"
+    groupId = "ballerina"
+    modules = ["jsonutils"]
+
+    [[platform.libraries]]
+    artifactId = "jsonutils"
+    version = "1.0.0"
+    path = "../jsonutils-test-utils/build/libs/jsonutils-test-utils-1.0.0.jar"
+    groupId = "org.ballerinalang.stdlib.jsonutils"
+    modules = ["jsonutils"]
+    scope = "testOnly"

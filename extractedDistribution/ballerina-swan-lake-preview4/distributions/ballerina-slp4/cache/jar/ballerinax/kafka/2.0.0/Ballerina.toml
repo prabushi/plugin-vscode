@@ -1,0 +1,43 @@
+[project]
+org-name = "ballerinax"
+version = "2.0.0"
+
+[dependencies]
+"ballerina/config" = "1.0.0"
+"ballerina/file" = "0.5.1"
+"ballerina/filepath" = "0.7.1"
+"ballerina/io" = "0.5.0"
+"ballerina/log" = "1.0.0"
+"ballerina/runtime" = "0.5.0"
+"ballerina/stringutils" = "0.5.0"
+"ballerina/system" = "0.6.0"
+"ballerina/time" = "1.0.1"
+
+[platform]
+target = "java8"
+
+    [[platform.libraries]]
+    artifactId = "kafka"
+    version = "2.0.0"
+    path = "../kafka-native/build/libs/kafka-native-2.0.0.jar"
+    groupId = "org.ballerinalang.messaging.kafka"
+    modules = ["kafka"]
+
+    [[platform.libraries]]
+    artifactId = "kafka-clients"
+    version = "2.3.1"
+    path = "./lib/kafka-clients-2.3.1.jar"
+    groupId = "org.apache.kafka"
+
+    [[platform.libraries]]
+    artifactId = "kafka_2.12"
+    version = "2.3.1"
+    path = "./lib/kafka_2.12-2.3.1.jar"
+    groupId = "org.apache.kafka"
+
+    [[platform.libraries]]
+    artifactId = "avro"
+    version = "1.9.2"
+    path = "./lib/avro-1.9.2.jar"
+    groupId = "org.apache.avro"
+    scope = "compile"
