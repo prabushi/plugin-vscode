@@ -47,7 +47,7 @@
         "request": "launch",
         "name": "Server",
         "cwd": "${workspaceFolder}",
-        "program": "${workspaceFolder}/src/debugger/start.ts",
+        "program": "${workspaceFolder}/src/debugger/index.js",
         "args": [ "--server=4711" ],
         "outFiles": [ "${workspaceFolder}/out/src/debugger/**/*.js" ],
     },
