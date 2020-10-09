@@ -1,0 +1,31 @@
+name: Draft A Release
+
+on:
+    workflow_dispatch:
+        inputs:
+            version:
+                description: Release Version
+                required: true
+                default: Swan Lake Preview 5
+        branches: [ master ]
+
+jobs:
+    test_build:
+        runs-on: ubuntu-latest
+        steps:
+            - uses: actions/checkout@v2
+            - uses: actions/setup-node@v1
+              with:
+                node-version: 12
+            - run: npm ci
+            - run: ./gradlew clean build -x test
+
+    draft_release:
+        needs: test_build
+        runs-on: ubuntu-latest
+
+        steps:
+            - uses: release-drafter/release-drafter@v5
+              env:
+                  GITHUB_TOKEN: "${{ secrets.TOKEN }}"
+             
