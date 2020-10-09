@@ -10,24 +10,57 @@ on:
         branches: [ master ]
 
 jobs:
-    test_build:
-        runs-on: ubuntu-latest
-        steps:
-            - uses: actions/checkout@v2
-            - uses: actions/setup-node@v1
-              with:
-                node-version: 12
-            - run: npm ci
-            - run: ./gradlew clean build -x test
+    # test_build:
+    #     runs-on: ubuntu-latest
+    #     steps:
+    #         - uses: actions/checkout@v2
+    #         - uses: actions/setup-node@v1
+    #           with:
+    #             node-version: 12
+    #         - run: npm ci
+    #         - run: ./gradlew clean build -x test
 
-    draft_release:
-        needs: test_build
-        runs-on: ubuntu-latest
+    # draft_release:
+    #     needs: test_build
+    #     runs-on: ubuntu-latest
 
-        steps:
-            - uses: release-drafter/release-drafter@v5
-              with:
-                config-name: release-drafter.yml
-              env:
-                  GITHUB_TOKEN: "${{ secrets.TOKEN }}"
+    #     steps:
+    #         - uses: release-drafter/release-drafter@v5
+    #           with:
+    #             config-name: release-drafter.yml
+    #           env:
+    #               GITHUB_TOKEN: "${{ secrets.TOKEN }}"
+
+  build:
+    name: Upload Release Asset
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v2
+      - name: Build project
+        uses: actions/setup-node@v1
+        with:
+          node-version: 12
+      - run: npm ci
+      - run: ./gradlew clean build -x test
+      - name: Create Release
+        id: create_release
+        uses: actions/create-release@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.TOKEN }}
+        with:
+          tag_name: tag1
+          release_name: Release Preview4
+          draft: false
+          prerelease: true
+      - name: Upload Release Asset
+        id: upload-release-asset 
+        uses: actions/upload-release-asset@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.TOKEN }}
+        with:
+          upload_url: ${{ steps.create_release.outputs.upload_url }} # This pulls from the CREATE RELEASE step above, referencing it's ID to get its outputs object, which include a `upload_url`. See this blog post for more info: https://jasonet.co/posts/new-features-of-github-actions/#passing-data-to-future-steps 
+          asset_path: ./*.vsix
+          asset_name: ballerina-2.0.0-Preview5-SNAPSHOT.vsix
+          asset_content_type: application/octet-stream
              
