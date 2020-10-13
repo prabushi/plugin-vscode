@@ -1,0 +1,20 @@
+# Publish the extension to market place
+name: Publish VSCode Extension
+
+on:
+  workflow_dispatch:
+    branches: [master]
+
+jobs:
+  build:
+    name: Package and publish
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v2
+      - name: Install node
+        uses: actions/setup-node@v1
+        with:
+          node-version: 12
+      - run: npm ci && npm install -g vsce
+      - run: vsce package && vsce publish -p ${{ secrets.EXTENSION_PUBLISH_TOKEN }}
