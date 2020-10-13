@@ -1,5 +1,5 @@
 # Publish the extension to market place
-name: Publish the vscode extension
+name: Publish VSCode extension
 
 on:
   workflow_dispatch:
@@ -17,5 +17,6 @@ jobs:
         with:
           node-version: 12
       - run: npm ci
-      - run: ./gradlew clean build -x test
+      - run: npm install -g vsce
+      - run: vsce package
       - run: vsce publish -p ${{ secrets.EXTENSION_PUBLISH_TOKEN }}
