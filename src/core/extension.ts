@@ -244,6 +244,11 @@ export class BallerinaExtension {
      * @returns {number}
      */
     compareVersions(pluginVersion: string, ballerinaVersion: string, comparePatchVer: boolean = false): number {
+        const swanLakeRegex = /(s|S)wan(| )(l|L)ake/g;
+        if (pluginVersion.match(swanLakeRegex) || ballerinaVersion.match(swanLakeRegex)) {
+            return 0;
+        }
+
         const toInt = (i: string) => {
             return parseInt(i, 10);
         };
