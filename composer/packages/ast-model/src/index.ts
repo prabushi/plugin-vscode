@@ -14,3 +14,4 @@ export { Disposable } from "./events";
 export * from "./ast-interfaces";
 export * from "./base-visitor";
 export * from "./check-kind-util";
+export { getCodeLensList } from "./doc-gen/index";

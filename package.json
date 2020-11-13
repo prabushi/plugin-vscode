@@ -286,6 +286,9 @@
         "lint": "tslint --fix 'src/**/*{.ts,.tsx}'"
     },
     "dependencies": {
+        "@ballerina/ast-model": "file:composer/packages/ast-model",
+        "@ballerina/composer-cli": "file:composer/tools/composer-cli",
+        "@ballerina/lang-service": "file:composer/packages/lang-service",
         "@types/js-base64": "^2.3.1",
         "cross-env": "^5.2.0",
         "dom-parser": "^0.1.6",
