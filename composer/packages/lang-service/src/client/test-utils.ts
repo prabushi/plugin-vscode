@@ -1,10 +1,14 @@
-import { InitializeParams, InitializeResult,
-    Location, TextDocumentPositionParams } from "vscode-languageserver-protocol";
+import {
+    FoldingRange, FoldingRangeParams, InitializeParams, InitializeResult,
+    Location, TextDocumentPositionParams
+} from "vscode-languageserver-protocol";
 import { BallerinaASTNode, BallerinaEndpoint, BallerinaSourceFragment } from "./ast-models";
-import { ASTDidChangeParams, ASTDidChangeResponse, BallerinaExampleListParams,
+import {
+    ASTDidChangeParams, ASTDidChangeResponse, BallerinaExampleListParams,
     BallerinaExampleListResponse, BallerinaProject, GetASTParams, GetASTResponse, GetBallerinaProjectParams,
     GetProjectASTParams, GetProjectASTResponse, GoToSourceParams, IBallerinaLangClient,
-    RevealRangeParams } from "./model";
+    RevealRangeParams
+} from "./model";
 
 // tslint:disable:no-object-literal-type-assertion
 export class EmptyLanguageClient implements IBallerinaLangClient {
@@ -44,6 +48,10 @@ export class EmptyLanguageClient implements IBallerinaLangClient {
     }
 
     public getDefinitionPosition(params: TextDocumentPositionParams): Thenable<Location> {
+        return Promise.reject();
+    }
+
+    public getFoldingRange(params: FoldingRangeParams): Thenable<FoldingRange[]> {
         return Promise.reject();
     }
 

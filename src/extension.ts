@@ -29,9 +29,12 @@ import { activateDebugConfigProvider } from './debugger';
 import { activate as activateProjectFeatures } from './project';
 import { activate as activateOverview } from './overview';
 import { activate as activateSyntaxHighlighter } from './syntax-highlighter';
-import { StaticFeature, ClientCapabilities, DocumentSelector, ServerCapabilities, DidChangeConfigurationParams } from 'vscode-languageclient';
+import { StaticFeature, DidChangeConfigurationParams } from 'vscode-languageclient';
 import { ExtendedLangClient } from './core/extended-language-client';
 import { log } from './utils';
+// import { BallerinaFoldingRangeProvider } from './project/folding-range-provider';
+// import { FoldingRangeFeature } from 'vscode-languageclient/lib/foldingRange';
+import { ClientCapabilities, ServerCapabilities, DocumentSelector } from 'vscode-languageserver-protocol';
 
 // TODO initializations should be contributions from each component
 function onBeforeInit(langClient: ExtendedLangClient) {
@@ -61,6 +64,41 @@ function onBeforeInit(langClient: ExtendedLangClient) {
         initialize(capabilities: ServerCapabilities, documentSelector: DocumentSelector | undefined): void {
         }
     }
+
+    // class BallerinaFoldingRangeFeature implements FoldingRangeFeature {
+    //     fillClientCapabilities(capabilites: ClientCapabilities): void {
+    //         throw new Error('Method not implemented.');
+    //     }
+    //     initialize(capabilities: ServerCapabilities, documentSelector: DocumentSelector): void {
+    //         throw new Error('Method not implemented.');
+    //     }
+    //     protected registerLanguageProvider(options: TextDocumentRegistrationOptions): Disposable {
+    //         throw new Error('Method not implemented.');
+    //     }
+    //     protected _client: BaseLanguageClient;
+    //     protected _providers: Map<string, Disposable>;
+    //     messages: RPCMessageType;
+    //     register(message: RPCMessageType, data: RegistrationData<TextDocumentRegistrationOptions>): void {
+    //         throw new Error('Method not implemented.');
+    //     }
+    //     unregister(id: string): void {
+    //         throw new Error('Method not implemented.');
+    //     }
+    //     dispose(): void {
+    //         throw new Error('Method not implemented.');
+    //     }
+    // }
+    // const foldingRangeFeature = new FoldingRangeFeature(langClient);
+    // const capabilites: ClientCapabilities = {
+    //     textDocument: {
+    //         foldingRange: {
+    //             dynamicRegistration: true,
+    //             lineFoldingOnly: false
+    //         }
+    //     }
+    // }
+    // foldingRangeFeature.fillClientCapabilities(capabilites);
+    // langClient.registerFeature(foldingRangeFeature);
 
     langClient.registerFeature(new TraceLogsFeature());
     langClient.registerFeature(new ShowFileFeature());
@@ -107,6 +145,9 @@ export function activate(context: ExtensionContext): Promise<any> {
                     window.showTextDocument(Uri.parse(location.uri.toString()), { selection: location.range });
                 }
             });
+
+            // const documentSelector: DocumentSelector = [{ language: 'ballerina' }];
+            // languages.registerFoldingRangeProvider(documentSelector, new BallerinaFoldingRangeProvider(langClient));
         });
     }).catch((e) => {
         log("Failed to activate Ballerina extension. " + (e.message ? e.message : e));

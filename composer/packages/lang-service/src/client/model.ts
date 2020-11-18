@@ -1,7 +1,11 @@
-import { InitializeParams, InitializeResult, Location, Position,
-    Range, TextDocumentPositionParams} from "vscode-languageserver-protocol";
-import { BallerinaAST, BallerinaASTNode, BallerinaEndpoint,
-    BallerinaSourceFragment } from "./ast-models";
+import {
+    FoldingRange, FoldingRangeParams, InitializeParams, InitializeResult, Location, Position,
+    Range, TextDocumentPositionParams
+} from "vscode-languageserver-protocol";
+import {
+    BallerinaAST, BallerinaASTNode, BallerinaEndpoint,
+    BallerinaSourceFragment
+} from "./ast-models";
 
 export interface GetProjectASTParams {
     sourceRoot: string;
@@ -106,13 +110,15 @@ export interface IBallerinaLangClient {
 
     fetchExamples: (params: BallerinaExampleListParams) => Thenable<BallerinaExampleListResponse>;
 
-    parseFragment: (params: BallerinaSourceFragment) => Thenable<BallerinaASTNode> ;
+    parseFragment: (params: BallerinaSourceFragment) => Thenable<BallerinaASTNode>;
 
     getEndpoints: () => Thenable<BallerinaEndpoint[]>;
 
     getBallerinaProject: (params: GetBallerinaProjectParams) => Thenable<BallerinaProject>;
 
     getDefinitionPosition: (params: TextDocumentPositionParams) => Thenable<Location>;
+
+    getFoldingRange: (params: FoldingRangeParams) => Thenable<FoldingRange[]>;
 
     goToSource: (params: GoToSourceParams) => void;
 

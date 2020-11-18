@@ -4,6 +4,7 @@ import { TM_EVENT_OPEN_DETECTED_PROJECT_ROOT_VIA_PROMPT, CMP_PROJECT_SUPPORT } f
 import { activateTestRunner } from "./cli-cmds/test";
 import { activateBuildCommand } from "./cli-cmds/build";
 import { activateRunCommand } from "./cli-cmds/run";
+import { FoldingRangeParams, TextDocumentIdentifier } from "vscode-languageclient";
 
 function promptOpenFolder(path: string) {
     const reporter = ballerinaExtInstance.telemetryReporter;
@@ -40,6 +41,11 @@ export function activate(ballerinaExtInstance: BallerinaExtension) {
                 if (project.path) {
                     promptOpenFolder(project.path);
                 }
+            });
+            const textDocument: TextDocumentIdentifier = { uri: document.uri.toString() };
+            const foldingRangeParams: FoldingRangeParams = { textDocument };
+            langClient.getFoldingRange(foldingRangeParams).then((foldingRange) => {
+                console.log("Successs", foldingRange);
             });
         }
     });

@@ -1,12 +1,16 @@
 // tslint:disable-next-line:no-submodule-imports
 import { IConnection } from "monaco-languageclient/lib/connection";
-import { InitializeParams, InitializeResult,
-    Location, TextDocumentPositionParams } from "vscode-languageserver-protocol";
+import {
+    FoldingRange, FoldingRangeParams, InitializeParams, InitializeResult,
+    Location, TextDocumentPositionParams
+} from "vscode-languageserver-protocol";
 import { BallerinaASTNode, BallerinaEndpoint, BallerinaSourceFragment } from "./ast-models";
-import { ASTDidChangeParams, ASTDidChangeResponse, BallerinaExampleListParams,
+import {
+    ASTDidChangeParams, ASTDidChangeResponse, BallerinaExampleListParams,
     BallerinaExampleListResponse, BallerinaProject, GetASTParams, GetASTResponse,
     GetBallerinaProjectParams, GetProjectASTParams, GetProjectASTResponse, GoToSourceParams,
-    IBallerinaLangClient, RevealRangeParams } from "./model";
+    IBallerinaLangClient, RevealRangeParams
+} from "./model";
 
 export class BallerinaLangClient implements IBallerinaLangClient {
 
@@ -19,10 +23,10 @@ export class BallerinaLangClient implements IBallerinaLangClient {
     public init(params: InitializeParams = initParams): Thenable<InitializeResult> {
         this.lsConnection.listen();
         return this.lsConnection.initialize(params)
-                .then((resp) => {
-                    this.isInitialized = true;
-                    return resp;
-                });
+            .then((resp) => {
+                this.isInitialized = true;
+                return resp;
+            });
     }
 
     public getProjectAST(params: GetProjectASTParams): Thenable<GetProjectASTResponse> {
@@ -47,7 +51,7 @@ export class BallerinaLangClient implements IBallerinaLangClient {
 
     public getEndpoints(): Thenable<BallerinaEndpoint[]> {
         return this.lsConnection.sendRequest("ballerinaSymbol/endpoints", {})
-                    .then((resp: any) => resp.endpoints);
+            .then((resp: any) => resp.endpoints);
     }
 
     public getBallerinaProject(params: GetBallerinaProjectParams): Thenable<BallerinaProject> {
@@ -59,8 +63,12 @@ export class BallerinaLangClient implements IBallerinaLangClient {
         return Promise.reject("Not implemented");
     }
 
+    public getFoldingRange(params: FoldingRangeParams): Thenable<FoldingRange[]> {
+        return this.lsConnection.sendRequest("textDocument/foldingRange", params);
+    }
+
     public goToSource(params: GoToSourceParams): void {
-       // TODO
+        // TODO
     }
 
     public revealRange(params: RevealRangeParams): void {

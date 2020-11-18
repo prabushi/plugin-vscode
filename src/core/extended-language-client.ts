@@ -18,7 +18,7 @@
  *
  */
 
-import { LanguageClient, TextDocumentPositionParams } from "vscode-languageclient";
+import { FoldingRange, FoldingRangeParams, LanguageClient, TextDocumentPositionParams } from "vscode-languageclient";
 import { Uri, Location } from "vscode";
 
 export const BALLERINA_LANG_ID = "ballerina";
@@ -58,7 +58,7 @@ export interface BallerinaExampleCategory {
     title: string;
     column: number;
     samples: Array<BallerinaExample>;
-}   
+}
 
 export interface BallerinaExampleListRequest {
     filter?: string;
@@ -126,7 +126,7 @@ export interface BallerinaSynResponse {
 }
 
 export interface GetSynRequest {
-    Params : string;
+    Params: string;
 }
 
 export class ExtendedLangClient extends LanguageClient {
@@ -138,10 +138,11 @@ export class ExtendedLangClient extends LanguageClient {
 
     getSyntaxHighlighter(params: string): Thenable<BallerinaSynResponse> {
         const req: GetSynRequest = {
-            Params: params};
-        return this.sendRequest("ballerinaSyntaxHighlighter/list",req);
+            Params: params
+        };
+        return this.sendRequest("ballerinaSyntaxHighlighter/list", req);
     }
-    
+
     getAST(uri: Uri): Thenable<BallerinaASTResponse> {
         const req: GetASTRequest = {
             documentIdentifier: {
@@ -166,12 +167,12 @@ export class ExtendedLangClient extends LanguageClient {
     }
 
     parseFragment(args: BallerinaFragmentASTRequest): Thenable<BallerinaFragmentASTResponse> {
-        return this.sendRequest("ballerinaFragment/ast", args).then((resp: any)=> resp.ast);
+        return this.sendRequest("ballerinaFragment/ast", args).then((resp: any) => resp.ast);
     }
 
     getEndpoints(): Thenable<Array<any>> {
         return this.sendRequest("ballerinaSymbol/endpoints", {})
-                    .then((resp: any) => resp.endpoints);
+            .then((resp: any) => resp.endpoints);
     }
 
     getBallerinaOASDef(uri: Uri, oasService: string): Thenable<BallerinaOASResponse> {
@@ -209,12 +210,16 @@ export class ExtendedLangClient extends LanguageClient {
 
     getDefinitionPosition(params: TextDocumentPositionParams): Thenable<Location> {
         return this.sendRequest("textDocument/definition", params)
-        .then((res) => {
-            const definitions = res as any;
-            if(!(definitions.length > 0)) {
-                return Promise.reject();
-            }
-            return definitions[0];
-        });
+            .then((res) => {
+                const definitions = res as any;
+                if (!(definitions.length > 0)) {
+                    return Promise.reject();
+                }
+                return definitions[0];
+            });
+    }
+
+    getFoldingRange(params: FoldingRangeParams): Thenable<FoldingRange[]> {
+        return this.sendRequest("textDocument/foldingRange", params);
     }
 }
