@@ -17,7 +17,7 @@
  * under the License.
  *
  */
-import { ExtensionContext, commands, window, Location, Uri, workspace } from 'vscode';
+import { ExtensionContext, commands, window, Location, Uri, workspace, languages } from 'vscode';
 import { ballerinaExtInstance } from './core';
 // import { activate as activateAPIEditor } from './api-editor';
 // import { activate as activateDiagram } from './diagram'; 
@@ -32,7 +32,7 @@ import { activate as activateSyntaxHighlighter } from './syntax-highlighter';
 import { StaticFeature, ClientCapabilities, DocumentSelector, ServerCapabilities, DidChangeConfigurationParams } from 'vscode-languageclient';
 import { ExtendedLangClient } from './core/extended-language-client';
 import { log } from './utils';
-// import { CodelensProvider } from './docs/codelens-provider';
+import { CodelensProvider } from './docs/codelens-provider';
 
 // TODO initializations should be contributions from each component
 function onBeforeInit(langClient: ExtendedLangClient) {
@@ -109,9 +109,9 @@ export function activate(context: ExtensionContext): Promise<any> {
                 }
             });
 
-            // const docCodelensProvider = new CodelensProvider(langClient);
-            // const documentSelector: DocumentSelector = [{ language: 'ballerina' }];
-            // languages.registerCodeLensProvider(documentSelector, docCodelensProvider);
+            const docCodelensProvider = new CodelensProvider(langClient);
+            const documentSelector: DocumentSelector = [{ language: 'ballerina' }];
+            languages.registerCodeLensProvider(documentSelector, docCodelensProvider);
 
         });
     }).catch((e) => {

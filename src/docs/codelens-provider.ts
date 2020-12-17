@@ -1,8 +1,7 @@
 import * as vscode from 'vscode';
 import { ExtendedLangClient } from '../core/extended-language-client';
-
-enum NODE_TYPES { FUNCTION = "Function", CLASS = "ClassDefn", TYPE = "TypeDefinition", RECORD = "RecordType" }
-enum API_DOC_DIR { FUNCTION = "functions", CLASS = "classes", RECORD = "records", OBJECT = "abstractobjects" }
+import { getCodeLens } from './documentation-visitor';
+import * as path from 'path';
 
 /**
  * CodelensProvider for API document generation.
@@ -36,107 +35,30 @@ export class CodelensProvider implements vscode.CodeLensProvider {
     }
 
     private getCodeLensList(document: vscode.TextDocument): Thenable<vscode.CodeLens[]> {
-        return this.client.getAST(document.uri).then((response) => this.loadCodeLensList(response));
+        return this.client.getSyntaxTree(document.uri).then((response) => this.loadCodeLensList(response, document.fileName));
     }
 
-    private loadCodeLensList(response) {
-        let codeLenses: vscode.CodeLens[] = [];
-        if (!response.ast || !response.ast.topLevelNodes) {
-            return codeLenses;
+    private loadCodeLensList(response, filePath: string) {
+        const emptyCodeLens: vscode.CodeLens[] = [];
+        if (!vscode.workspace.workspaceFolders || vscode.workspace.workspaceFolders.length === 0) {
+            return emptyCodeLens;
+        }
+        const rootPath: string = vscode.workspace.workspaceFolders![0].uri.fsPath;
+        const workspacePath: string = rootPath.substring(0, rootPath.lastIndexOf(path.sep));
+        let paths: string[] = filePath.substring(workspacePath.length + 1).split(path.sep);
+        let moduleName;
+        if (paths.length === 2) {
+            moduleName = paths[0];
+        } else if (paths.length === 4) {
+            moduleName = paths[2];
+        } else {
+            return emptyCodeLens;
         }
 
-        const documentables = [NODE_TYPES.FUNCTION, NODE_TYPES.TYPE, NODE_TYPES.CLASS];
-        const topNodes = response.ast.topLevelNodes;
-        for (let nodeIndex = 0; nodeIndex < topNodes.length; nodeIndex++) {
-            const node = topNodes[nodeIndex];
-            if (documentables.indexOf(node.kind) !== -1) {
-                if (node.markdownDocumentationAttachment && node.public) {
-                    codeLenses.push(this.createCodeLens(node));
-                    continue;
-                }
-
-                if (node.kind === NODE_TYPES.CLASS && node.public && node.functions) {
-                    const classChildrenArray = node.functions;
-                    let isAdded = false;
-                    for (let index = 0; index < classChildrenArray.length; index++) {
-                        const childFunction = classChildrenArray[index];
-                        if (!isAdded && childFunction.markdownDocumentationAttachment && childFunction.public) {
-                            codeLenses.push(this.createCodeLens(node));
-                            isAdded = true;
-                            break;
-                        }
-                    }
-
-                    if (!isAdded && node.initFunction && node.initFunction.markdownDocumentationAttachment
-                        && node.initFunction.public) {
-                        codeLenses.push(this.createCodeLens(node));
-                    }
-
-                } else if (node.kind === NODE_TYPES.TYPE && node.public && node.typeNode && node.typeNode.functions) {
-                    const typeChildrenArray = node.typeNode.functions;
-                    for (let index = 0; index < typeChildrenArray.length; index++) {
-                        const childFunction = typeChildrenArray[index];
-                        if (childFunction.markdownDocumentationAttachment && childFunction.public) {
-                            codeLenses.push(this.createCodeLens(node));
-                            break;
-                        }
-                    }
-                }
-            }
+        if (response.syntaxTree) {
+            return getCodeLens(response.syntaxTree, moduleName);
         }
-        return codeLenses;
-    }
-
-    private createCodeLens(node): vscode.CodeLens {
-        const { position } = node.markdownDocumentationAttachment ? node.markdownDocumentationAttachment : node;
-        const startLine = position.startLine;
-        const startColumn = position.startColumn;
-        const endLine = position.endLine;
-        const endColumn = position.endColumn;
-        const codeLens = new vscode.CodeLens(new vscode.Range(startLine, startColumn, endLine, endColumn));
-        codeLens.command = {
-            title: "Preview Docs",
-            tooltip: "Click to preview documentation",
-            command: "ballerina.showDocs",
-            arguments: [
-                {
-                    moduleName: this.getModuleName(node),
-                    nodeType: this.getNodeType(node),
-                    nodeName: this.getNodeName(node)
-                }
-            ]
-        };
-        return codeLens;
-    }
-
-    private getNodeType(node): string {
-        if (node.kind === NODE_TYPES.FUNCTION) {
-            return API_DOC_DIR.FUNCTION;
-        }
-        if (node.kind === NODE_TYPES.CLASS) {
-            return API_DOC_DIR.CLASS;
-        }
-        if (node.kind === NODE_TYPES.TYPE) {
-            if (node.typeNode.kind === NODE_TYPES.RECORD) {
-                return API_DOC_DIR.RECORD;
-            }
-            return API_DOC_DIR.OBJECT;
-        }
-        return '';
-    }
-
-    private getModuleName(node): string {
-        if (node.typeInfo) {
-            return node.typeInfo.modName;
-        }
-        if (node.kind === NODE_TYPES.TYPE && node.typeNode) {
-            return node.typeNode.typeInfo.modName;
-        }
-        return '';
-    }
-
-    private getNodeName(node): string {
-        return node.name.value;
+        return emptyCodeLens;
     }
 }
 

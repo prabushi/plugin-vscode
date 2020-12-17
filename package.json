@@ -286,6 +286,7 @@
         "lint": "tslint --fix 'src/**/*{.ts,.tsx}'"
     },
     "dependencies": {
+        "@ballerina/syntax-tree": "file:composer/packages/syntax-tree",
         "@types/js-base64": "^2.3.1",
         "cross-env": "^5.2.0",
         "dom-parser": "^0.1.6",

@@ -16,7 +16,7 @@
  * under the License.
  *
  */
-import { commands, window, ViewColumn, ExtensionContext, WebviewPanel } from 'vscode';
+import { commands, window, ViewColumn, ExtensionContext, WebviewPanel, workspace, Uri } from 'vscode';
 import * as _ from 'lodash';
 import { render } from './renderer';
 import { ExtendedLangClient } from '../core/extended-language-client';
@@ -26,20 +26,20 @@ import { TM_EVENT_OPEN_DOC_PREVIEW, CMP_DOCS_PREVIEW } from '../telemetry';
 import * as path from 'path';
 import { getCurrentBallerinaProject } from "../utils/project-utils";
 import { runCommandOnBackground, BALLERINA_COMMANDS } from '../project/cli-cmds/cmd-runner';
-// import DOMParser = require('dom-parser');
+import DOMParser = require('dom-parser');
 import * as fs from "fs";
 
 let previewPanel: WebviewPanel | undefined;
 
-// function updateWebView(docHtml: string, nodeType: string): void {
-// 	if (previewPanel) {
-// 		previewPanel.webview.postMessage({
-// 			command: 'update',
-// 			docHtml: docHtml,
-// 			nodeType: nodeType
-// 		});
-// 	}
-// }
+function updateWebView(docHtml: string, nodeType: string): void {
+	if (previewPanel) {
+		previewPanel.webview.postMessage({
+			command: 'update',
+			docHtml: docHtml,
+			nodeType: nodeType
+		});
+	}
+}
 
 function showDocs(context: ExtensionContext, langClient: ExtendedLangClient, args: any): void {
 	if (previewPanel) {
@@ -74,23 +74,16 @@ function showDocs(context: ExtensionContext, langClient: ExtendedLangClient, arg
 			return;
 		}
 
-		let htmlFilePath;
-		if (args.nodeType === 'functions') {
-			htmlFilePath = path.join(currentProject.path!, 'target', 'apidocs', args.moduleName,
-				`${args.nodeType}.html`);
-		} else {
-			htmlFilePath = path.join(currentProject.path!, 'target', 'apidocs', args.moduleName,
-				args.nodeType, `${args.nodeName}.html`);
-		}
+		let htmlFilePath = path.join(currentProject.path!, 'target', 'apidocs', currentProject.packageName!, 'index.html');
 
 		fs.watchFile(htmlFilePath, () => {
 			extractHTMLToRender(htmlFilePath, args);
 			fs.unwatchFile(htmlFilePath);
 		});
 
-		const result = runCommandOnBackground(currentProject, BALLERINA_COMMANDS.DOC, args.moduleName);
+		const result = runCommandOnBackground(currentProject, BALLERINA_COMMANDS.DOC, currentProject.path!);
 		if (!result) {
-			window.showErrorMessage(`Error while generating docs for ${args.moduleName} module.`);
+			window.showErrorMessage(`Error while generating docs for ${currentProject.packageName!} package.`);
 			return;
 		}
 	});
@@ -101,28 +94,27 @@ function showDocs(context: ExtensionContext, langClient: ExtendedLangClient, arg
 }
 
 async function extractHTMLToRender(htmlFilePath: string, args: any) {
-	// const docsPathOnWorkspace = Uri.file(htmlFilePath);
-	// let doc = await workspace.openTextDocument(docsPathOnWorkspace);
-	// const parser = new DOMParser();
-	// const dom = parser.parseFromString(doc.getText());
-	// let elementToRender;
-	// if (args.nodeType === 'functions') {
-	// 	const elements: DOMParser.Node[] | null = dom.getElementsByClassName('method-content');
-	// 	if (elements) {
-	// 		for (let index = 0; index < elements.length; index++) {
-	// 			const urlLinks: DOMParser.Node[] | null = elements[index].getElementsByClassName('url-link');
-	// 			if (urlLinks && urlLinks[0].getAttribute('href') === `#${args.nodeName}`) {
-	// 				elementToRender = elements[index];
-	// 				break;
-	// 			}
-	// 		}
-	// 	}
-	// } else {
-	// 	elementToRender = dom.getElementById('main');
-	// }
+	let doc = await workspace.openTextDocument(Uri.file(htmlFilePath));
+	const parser = new DOMParser();
+	const dom = parser.parseFromString(doc.getText());
+	let elementToRender;
+	if (args.nodeType === 'functions') {
+		const elements: DOMParser.Node[] | null = dom.getElementsByClassName('method-content');
+		if (elements) {
+			for (let index = 0; index < elements.length; index++) {
+				const urlLinks: DOMParser.Node[] | null = elements[index].getElementsByClassName('url-link');
+				if (urlLinks && urlLinks[0].getAttribute('href') === `#${args.nodeName}`) {
+					elementToRender = elements[index];
+					break;
+				}
+			}
+		}
+	} else {
+		elementToRender = dom.getElementById('main');
+	}
 
-	// // update doc preview web view
-	// updateWebView(elementToRender.innerHTML, args.nodeType);
+	// update doc preview web view
+	updateWebView(elementToRender.innerHTML, args.nodeType);
 }
 
 export function activate(ballerinaExtInstance: BallerinaExtension) {
@@ -133,7 +125,7 @@ export function activate(ballerinaExtInstance: BallerinaExtension) {
 		reporter.sendTelemetryEvent(TM_EVENT_OPEN_DOC_PREVIEW, { component: CMP_DOCS_PREVIEW });
 		return ballerinaExtInstance.onReady()
 			.then(() => {
-				showDocs(context, langClient, args);
+				// showDocs(context, langClient, args);
 			})
 			.catch((e) => {
 				if (!ballerinaExtInstance.isValidBallerinaHome()) {

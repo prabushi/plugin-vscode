@@ -1,7 +1,10 @@
-import { InitializeParams, InitializeResult, Location, Position,
-    Range, TextDocumentPositionParams} from "vscode-languageserver-protocol";
-import { BallerinaAST, BallerinaASTNode, BallerinaEndpoint,
-    BallerinaSourceFragment } from "./ast-models";
+import {
+    InitializeParams, InitializeResult, Location, Position,
+    Range, TextDocumentPositionParams
+} from "vscode-languageserver-protocol";
+import {
+    BallerinaEndpoint, BallerinaSyntaxTree,
+} from "./ast-models";
 
 export interface GetProjectASTParams {
     sourceRoot: string;
@@ -18,33 +21,22 @@ export interface ProjectAST {
         compilationUnits: {
             [compilationUnitName: string]: {
                 name: string,
-                ast: BallerinaAST,
+                syntaxTree: BallerinaSyntaxTree,
                 uri: string,
             }
         }
     };
 }
 
-export interface GetASTParams {
+export interface GetSyntaxTreeParams {
     documentIdentifier: {
         uri: string;
     };
 }
 
-export interface GetASTResponse {
-    ast: BallerinaAST;
+export interface GetSyntaxTreeResponse {
+    syntaxTree: BallerinaSyntaxTree;
     parseSuccess: boolean;
-}
-
-export interface ASTDidChangeResponse {
-    content?: string;
-}
-
-export interface ASTDidChangeParams {
-    textDocumentIdentifier: {
-        uri: string;
-    };
-    ast: BallerinaAST;
 }
 
 export interface GoToSourceParams {
@@ -100,13 +92,9 @@ export interface IBallerinaLangClient {
 
     getProjectAST: (params: GetProjectASTParams) => Thenable<GetProjectASTResponse>;
 
-    getAST: (params: GetASTParams) => Thenable<GetASTResponse>;
-
-    astDidChange: (params: ASTDidChangeParams) => Thenable<ASTDidChangeResponse>;
+    getSyntaxTree: (params: GetSyntaxTreeParams) => Thenable<GetSyntaxTreeResponse>;
 
     fetchExamples: (params: BallerinaExampleListParams) => Thenable<BallerinaExampleListResponse>;
-
-    parseFragment: (params: BallerinaSourceFragment) => Thenable<BallerinaASTNode> ;
 
     getEndpoints: () => Thenable<BallerinaEndpoint[]>;
 

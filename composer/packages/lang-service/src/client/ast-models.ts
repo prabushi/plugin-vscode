@@ -1,4 +1,4 @@
-export interface BallerinaAST {
+export interface BallerinaSyntaxTree {
     id: string;
     kind: string;
     topLevelNodes: BallerinaASTNode[];
@@ -9,9 +9,4 @@ export interface BallerinaASTNode {
 export interface BallerinaEndpoint {
     packageName: string;
     name: string;
-}
-export interface BallerinaSourceFragment {
-    source: string;
-    expectedNodeType: string;
-    enclosingScope?: string;
 }
