@@ -62,7 +62,8 @@ const treeItemKinds = {
 const itemKindsWithIcons = [
     treeItemKinds.SERVICE,
     treeItemKinds.FUNCTION,
-    treeItemKinds.RESOURCE
+    treeItemKinds.RESOURCE,
+    treeItemKinds.PROJECT_ROOT,
 ];
 
 const collapsibleKinds = [
@@ -235,86 +236,123 @@ export class ProjectTreeProvider implements vscode.TreeDataProvider<ProjectTreeE
 
     private buildProjectTree(packages: Packages, sourceRoot: string): ProjectTreeElement[] {
         const moduleElementList: ProjectTreeElement[] = [];
-        const nonDefaultModuleElements: ProjectTreeElement[] = [];
-        Object.keys(packages[0].modules).forEach(moduleId => {
-            let filePath: string;
-            const moduleNode = packages[0].modules[moduleId];
-            let moduleName: string;
-            if (moduleNode.default) {
-                moduleName = packages[0].name;
-                filePath = `${sourceRoot}${path.sep}`;
-            } else {
-                moduleName = moduleNode.name;
-                filePath = `${sourceRoot}${path.sep}modules${path.sep}${moduleName}${path.sep}`;
-            }
-            const moduleElement: ProjectTreeElement = {
-                sourceRoot: sourceRoot,
-                name: moduleName,
-                kind: 'Module',
-                topLevelNodes: [],
-            };
+        const allModules: Module[] = packages[0].modules;
 
-            const moduleTopLevelNodes: ProjectTreeElement[] = [];
-            Object.keys(moduleNode.functions).forEach(functionId => {
-                const functionNode = moduleNode.functions[functionId];
-                const functionFilePath = `${filePath}${functionNode.filePath}`;
-                moduleTopLevelNodes.push({
-                    sourceRoot,
-                    name: functionNode.name,
-                    kind: 'Function',
-                    moduleName,
-                    filePath: functionFilePath,
-                    startLine: functionNode.position.startLine,
-                    startColumn: functionNode.position.startColumn
-                });
-            });
-
-            Object.keys(moduleNode.services).forEach(serviceId => {
-                const serviceNode = moduleNode.services[serviceId];
-                const serviceFilePath = `${filePath}${serviceNode.filePath}`;
-                const serviceElement: ProjectTreeElement = {
-                    sourceRoot,
-                    name: serviceNode.name,
-                    kind: 'Service',
-                    moduleName,
-                    filePath: serviceFilePath,
-                    startLine: serviceNode.position.startLine,
-                    startColumn: serviceNode.position.startColumn
-                };
-                serviceElement.resources = serviceNode.resources.map((resourceNode: any) => {
-                    return {
-                        sourceRoot,
-                        name: resourceNode.name,
-                        kind: 'Resource',
-                        moduleName,
-                        serviceName: serviceNode.name,
-                        filePath: `${filePath}${serviceNode.filePath}`,
-                        startLine: resourceNode.position.startLine,
-                        startColumn: resourceNode.position.startColumn
-                    };
-                });
-                moduleTopLevelNodes.push(serviceElement);
-            });
-
-            if (moduleNode.default) {
-                moduleTopLevelNodes.forEach(node => {
-                    moduleElementList.push(node);
-                });
-            } else {
-                moduleTopLevelNodes.sort((node1, node2) => {
-                    if (node1.name && node2.name) {
-                        return node1.name.localeCompare(node2.name);
-                    }
-                    return -1;
-                });
-                moduleElement.topLevelNodes = moduleTopLevelNodes;
-                nonDefaultModuleElements.push(moduleElement);
-            }
+        const modules = allModules.filter(module => {
+            return !module.default;
         });
-        nonDefaultModuleElements.forEach(node => {
-            moduleElementList.push(node);
+        modules.sort((mod1, mod2) => {
+            return mod1.name!.localeCompare(mod2.name!);
+        });
+
+        const defaultModule = allModules.filter(module => {
+            return module.default;
+        }).pop();
+
+        // Add default module
+        if (defaultModule) {
+            const filePath = `${sourceRoot}${path.sep}`;
+            const defaultFunctions: FunctionOrResource[] = defaultModule.functions;
+            if (defaultFunctions) {
+                defaultFunctions.sort((func1, func2) => {
+                    return func1.name.localeCompare(func2.name);
+                });
+                defaultFunctions.forEach(functionNode => {
+                    moduleElementList.push(this.createFunctionElement(functionNode, defaultModule, sourceRoot, filePath));
+                });
+            }
+
+            const defaultServices: Service[] = defaultModule.services;
+            if (defaultServices) {
+                defaultServices.sort((service1, service2) => {
+                    return service1.name.localeCompare(service2.name);
+                });
+                defaultServices.forEach(serviceNode => {
+                    moduleElementList.push(this.createServiceElement(serviceNode, defaultModule, sourceRoot, filePath));
+                });
+            }
+        }
+
+        // Add non default modules
+        modules.forEach(module => {
+            if (!module.default) {
+                const filePath = `${sourceRoot}${path.sep}modules${path.sep}${module.name}${path.sep}`;
+                const moduleElement: ProjectTreeElement = {
+                    sourceRoot: sourceRoot,
+                    name: module.name!,
+                    kind: 'Module',
+                    topLevelNodes: [],
+                };
+
+                const moduleTopLevelNodes: ProjectTreeElement[] = [];
+                const functions: FunctionOrResource[] = module.functions;
+                if (functions) {
+                    functions.sort((func1, func2) => {
+                        return func1.name.localeCompare(func2.name);
+                    });
+                    functions.forEach(functionNode => {
+                        moduleTopLevelNodes.push(this.createFunctionElement(functionNode, module, sourceRoot, filePath));
+                    });
+                }
+
+                const services: Service[] = module.services;
+                if (services) {
+                    services.sort((service1, service2) => {
+                        return service1.name.localeCompare(service2.name);
+                    });
+                    services.forEach(serviceNode => {
+                        moduleTopLevelNodes.push(this.createServiceElement(serviceNode, module, sourceRoot, filePath));
+                    });
+                }
+                moduleElement.topLevelNodes = moduleTopLevelNodes;
+                moduleElementList.push(moduleElement);
+            }
         });
         return moduleElementList;
+    }
+
+    private createFunctionElement(functionNode: FunctionOrResource, module: Module, sourceRoot: string,
+        filePath: string): ProjectTreeElement {
+        const functionFilePath = `${filePath}${functionNode.filePath}`;
+        return {
+            sourceRoot,
+            name: functionNode.name,
+            kind: 'Function',
+            moduleName: module.name,
+            filePath: functionFilePath,
+            startLine: functionNode.position.startLine,
+            startColumn: functionNode.position.startColumn
+        };
+    }
+
+    private createServiceElement(serviceNode: Service, module: Module, sourceRoot: string, filePath: string):
+        ProjectTreeElement {
+        const serviceFilePath = `${filePath}${serviceNode.filePath}`;
+        const serviceElement: ProjectTreeElement = {
+            sourceRoot,
+            name: serviceNode.name,
+            kind: 'Service',
+            moduleName: module.name,
+            filePath: serviceFilePath,
+            startLine: serviceNode.position.startLine,
+            startColumn: serviceNode.position.startColumn
+        };
+        const resources: FunctionOrResource[] = serviceNode.resources.sort((res1, res2) => {
+            return res1.name.localeCompare(res2.name);
+        });
+        serviceElement.resources = resources.map((resourceNode: any) => {
+            return {
+                sourceRoot,
+                name: resourceNode.name,
+                kind: 'Resource',
+                moduleName: module.name,
+                serviceName: serviceNode.name,
+                filePath: serviceFilePath,
+                startLine: resourceNode.position.startLine,
+                startColumn: resourceNode.position.startColumn
+            };
+        });
+        return serviceElement;
     }
 
     /**
