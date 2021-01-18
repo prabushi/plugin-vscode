@@ -1,7 +1,7 @@
 import { ballerinaExtInstance } from "../../core";
 import { commands, window } from "vscode";
 import { TM_EVENT_EXECUTE_BALLERINA_RUN, CMP_BALLERINA_RUN } from "../../telemetry";
-import { runCommand, BALLERINA_COMMANDS } from "./cmd-runner";
+import { runCommand, BALLERINA_COMMANDS, PROJECT_TYPE } from "./cmd-runner";
 import { getCurrentBallerinaProject, getCurrentBallerinaFile, getCurrenDirectoryPath } from "../../utils/project-utils";
 
 function activateRunCommand() {
@@ -13,7 +13,7 @@ function activateRunCommand() {
             reporter.sendTelemetryEvent(TM_EVENT_EXECUTE_BALLERINA_RUN, { component: CMP_BALLERINA_RUN });
 
             const currentProject = await getCurrentBallerinaProject();
-            if (currentProject.packageName !== '.') {
+            if (currentProject.kind !== PROJECT_TYPE.SINGLE_FILE) {
                 runCommand(currentProject, BALLERINA_COMMANDS.RUN, currentProject.path!);
             } else {
                 runCurrentFile();

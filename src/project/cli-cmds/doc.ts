@@ -1,7 +1,7 @@
 import { ballerinaExtInstance } from "../../core";
 import { commands, window } from "vscode";
 import { TM_EVENT_EXECUTE_BALLERINA_DOC, CMP_BALLERINA_DOC } from "../../telemetry";
-import { runCommand, BALLERINA_COMMANDS } from "./cmd-runner";
+import { runCommand, BALLERINA_COMMANDS, PROJECT_TYPE } from "./cmd-runner";
 import { getCurrentBallerinaProject } from "../../utils/project-utils";
 
 function activateDocCommand() {
@@ -13,7 +13,7 @@ function activateDocCommand() {
             reporter.sendTelemetryEvent(TM_EVENT_EXECUTE_BALLERINA_DOC, { component: CMP_BALLERINA_DOC });
 
             const currentProject = await getCurrentBallerinaProject();
-            if (currentProject.packageName === '.') {
+            if (currentProject.kind === PROJECT_TYPE.SINGLE_FILE) {
                 window.showErrorMessage('Open editor does not reside inside a Ballerina project.');
                 return;
             }

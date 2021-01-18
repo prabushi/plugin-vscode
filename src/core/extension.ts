@@ -158,6 +158,8 @@ export class BallerinaExtension {
                     if (stateChangeEvent.newState === LS_STATE.Stopped) {
                         log("Couldn't establish language server connection.");
                         this.showPluginActivationError();
+                    } else {
+                        log("Else");
                     }
                 });
 

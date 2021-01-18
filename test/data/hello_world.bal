@@ -1,13 +1,10 @@
-import ballerina/io;
 
 // The `main` function, which acts as the entry point.
 public function main() {
-    io:println(getMessage());
+    string a = "Hello, World!";
 }
 
 # Returns a message
-#
-# + return - 'Hello Worl' value
-public function getMessage() returns string {
-    return "Hello, World!";
+public function getMessage() {
+    string a = "Hello, World!";
 }

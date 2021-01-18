@@ -5,6 +5,7 @@ import { activateTestRunner } from "./cli-cmds/test";
 import { activateBuildCommand } from "./cli-cmds/build";
 import { activateRunCommand } from "./cli-cmds/run";
 import { activateDocCommand } from "./cli-cmds/doc";
+import { PROJECT_TYPE } from "./cli-cmds/cmd-runner";
 
 function promptOpenFolder(path: string) {
     const reporter = ballerinaExtInstance.telemetryReporter;
@@ -38,7 +39,7 @@ export function activate(ballerinaExtInstance: BallerinaExtension) {
                     uri: document.uri.toString()
                 }
             }).then((project) => {
-                if (project.packageName !== '.') {
+                if (project.kind !== PROJECT_TYPE.SINGLE_FILE) {
                     promptOpenFolder(project.path!);
                 }
             });

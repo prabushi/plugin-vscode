@@ -94,10 +94,12 @@ export interface BallerinaAstOasChangeRequest {
 }
 
 export interface BallerinaProject {
+    kind: string;
     path?: string;
     version?: string;
     author?: string;
     packageName?: string;
+    king: string;
 }
 
 export interface GetBallerinaProjectParams {
