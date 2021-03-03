@@ -32,9 +32,9 @@ const PLATFORM_PREFIX = /jballerina-tools-/;
 
 function findBallerinaDistribution() {
     const directories = fs.readdirSync(TEST_RESOURCES);
-    console.log(directories.length);
-    if (directories.length === 0) {
-        throw new Error("Unable to find ballerina distribution in test resources.");
+    console.log("Dir length: " + directories.length);
+    if (directories.length === 1) {
+        return directories[0];
     }
     if (directories.length > 1) {
         directories.forEach(directory => {
@@ -42,9 +42,7 @@ function findBallerinaDistribution() {
             if (directory.startsWith('ballerina')) {
                 return directory;
             }
-        });
-    } else {
-        return directories[0];
+        }); 
     }
     throw new Error("Unable to find ballerina distribution in test resources.");
 }
