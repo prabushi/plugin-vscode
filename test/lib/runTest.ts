@@ -103,6 +103,15 @@ export async function runTests(options: TestOptions): Promise<number> {
 	}
 
 	console.log("# 2: runTests");
+	console.log("exe path: " + options.vscodeExecutablePath);
+	console.log("etnTestEnv: " + options.extensionTestsEnv);
+	if (options.extensionTestsEnv) {
+		console.log(options.extensionTestsEnv.toString());
+	}
+	console.log("args length: " + args.length);
+	args.forEach(element => {
+		console.log("#arg: " + element);
+	});
 	return innerRunTests(options.vscodeExecutablePath!, args, options.extensionTestsEnv);
 }
 
