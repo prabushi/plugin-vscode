@@ -86,6 +86,7 @@ export interface TestOptions {
  * @returns The exit code of the command to launch VS Code extension test
  */
 export async function runTests(options: TestOptions): Promise<number> {
+	console.log("# 1: runTests");
 	if (!options.vscodeExecutablePath) {
 		options.vscodeExecutablePath = await downloadAndUnzipVSCode(options.version, options.platform);
 	}
@@ -101,6 +102,7 @@ export async function runTests(options: TestOptions): Promise<number> {
 		args = options.launchArgs.concat(args);
 	}
 
+	console.log("# 2: runTests");
 	return innerRunTests(options.vscodeExecutablePath!, args, options.extensionTestsEnv);
 }
 
@@ -112,23 +114,28 @@ async function innerRunTests(
 	}
 ): Promise<number> {
 	return new Promise<number>((resolve, reject) => {
+		console.log("# 3: innerRunTests");
 		const fullEnv = Object.assign({}, process.env, testRunnerEnv);
 		const cmd = cp.spawn(executable, args, { env: fullEnv });
 
 		cmd.stdout.on('data', function (data) {
+			console.log("# 4: stdData");
 			console.log(data.toString());
 		});
 
 		cmd.stderr.on('data', function (data) {
+			console.log("# 5: stdErr");
 			console.error(data.toString());
 		});
 
 		cmd.on('error', function (data) {
+			console.log("# 6: err");
 			console.log('Test error: ' + data.toString());
 		});
 
 		let finished = false;
 		function onProcessClosed(code: number | null, signal: NodeJS.Signals | null): void {
+			console.log("# 6: onProcessClosed");
 			if (finished) {
 				return;
 			}

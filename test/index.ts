@@ -40,6 +40,7 @@ function _mkDirIfExists(dir: string): void {
 }
 
 function _readCoverOptions(testsRoot: string): ITestRunnerOptions | undefined {
+    console.log("#13: _readCoverOptions" + testsRoot);
     let coverConfigPath = paths.join(testsRoot, "..", "..", "coverconfig.json");
     const coverConfigType: string = process.env.COVER_CONFIG || "";
     if (fs.existsSync(coverConfigPath)) {
@@ -50,6 +51,7 @@ function _readCoverOptions(testsRoot: string): ITestRunnerOptions | undefined {
 }
 
 function run(testsRoot: string, clb: any): any {
+    console.log("#8: run");
     // Enable source map support
     require("source-map-support").install();
 
@@ -63,12 +65,15 @@ function run(testsRoot: string, clb: any): any {
 
     // Glob test files
     glob("**/**.test.js", { cwd: testsRoot }, (error, files): any => {
+        console.log("#9: global");
         if (error) {
+            console.log("#10: err " + error);
             return clb(error);
         }
         try {
             // Fill into Mocha
             files.forEach((f): Mocha => {
+                console.log("#11: for each file" + f);
                 return mocha.addFile(paths.join(testsRoot, f));
             });
             // Run the tests
@@ -82,6 +87,7 @@ function run(testsRoot: string, clb: any): any {
                 clb(undefined, failureCount);
             });
         } catch (error) {
+            console.log("#12: err " + error);
             return clb(error);
         }
     });
