@@ -45,6 +45,7 @@ jobs:
       - run: rm ballerina-${{ github.event.inputs.bal_dist_version }}.zip
       - run: npm ci
       - run: ./gradlew clean build --debug --stacktrace
+        uses: GabrielBB/xvfb-action@v1.0
       - name: Create Release Draft
         id: create_release
         uses: actions/create-release@v1
