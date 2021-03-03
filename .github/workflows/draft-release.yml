@@ -44,10 +44,7 @@ jobs:
           args: unzip -qq ballerina-${{ github.event.inputs.bal_dist_version }}.zip -d /extractedDistribution
       - run: rm ballerina-${{ github.event.inputs.bal_dist_version }}.zip
       - run: npm ci
-      - name: Build repository with headless test run
-        uses: GabrielBB/xvfb-action@v1
-        with:
-          run: ./gradlew clean build
+      - run: apt-get install xvfb && xvfb-run --auto-servernum ./gradlew clean build
       - name: Create Release Draft
         id: create_release
         uses: actions/create-release@v1
