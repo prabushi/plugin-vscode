@@ -39,9 +39,13 @@ jobs:
           args: http://dist-dev.ballerina.io/downloads/${{ github.event.inputs.bal_dist_version }}/ballerina-${{ github.event.inputs.bal_dist_version }}.zip
       - run: mkdir extractedDistribution
       - name: Unzip ballerina distribution
-        uses: montudor/action-zip@v0.1.0
+        uses: TonyBogdanov/zip@1.0
+        # uses: montudor/action-zip@v0.1.0
         with:
-          args: unzip -qq ballerina-${{ github.event.inputs.bal_dist_version }}.zip -d /extractedDistribution
+          args: unzip -qq ./ballerina-${{ github.event.inputs.bal_dist_version }}.zip -d ./extractedDistribution
+        # uses: TonyBogdanov/zip@1.0
+        # with:
+          # args: unzip -qq ./archive.zip -d ./target
       - run: cd extractedDistribution/ && ls
       - run: rm ballerina-${{ github.event.inputs.bal_dist_version }}.zip
       - run: cd extractedDistribution/ && ls
