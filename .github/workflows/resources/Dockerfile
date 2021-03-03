@@ -56,4 +56,4 @@ RUN cd plugin-vscode && mkdir extractedDistribution && \
 RUN cd plugin-vscode/ && npm i && export npm_package_engines_vscode=1.34.0 && node ./node_modules/vscode/bin/install
 
 # Execute gradle build
-RUN cd plugin-vscode && ./gradlew clean build
+RUN cd plugin-vscode && apt-get install xvfb -y && xvfb-run --auto-servernum ./gradlew clean build
