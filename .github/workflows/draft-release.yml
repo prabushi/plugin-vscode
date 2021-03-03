@@ -42,9 +42,16 @@ jobs:
         uses: montudor/action-zip@v0.1.0
         with:
           args: unzip -qq ballerina-${{ github.event.inputs.bal_dist_version }}.zip -d /extractedDistribution
+      - run: cd extractedDistribution/ && ls
       - run: rm ballerina-${{ github.event.inputs.bal_dist_version }}.zip
+      - run: cd extractedDistribution/ && ls
       - run: npm ci
-      - run: apt-get install xvfb && xvfb-run --auto-servernum ./gradlew clean build
+      - run: cd extractedDistribution/ && ls
+      - name: Build repository with tests
+        uses: GabrielBB/xvfb-action@v1.0
+        with:
+          run: ./gradlew clean build
+      # - run: apt-get install xvfb && xvfb-run --auto-servernum ./gradlew clean build
       - name: Create Release Draft
         id: create_release
         uses: actions/create-release@v1
