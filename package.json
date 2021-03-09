@@ -258,6 +258,15 @@
                     "light": "./resources/images/icons/refresh.svg",
                     "dark": "./resources/images/icons/refresh-inverse.svg"
                 }
+            },
+            {
+                "command": "ballerina.show.diagram",
+                "title": "Show Diagram Editor",
+                "icon": {
+                    "dark": "./resources/images/icons/design-view-inverse.svg",
+                    "light": "./resources/images/icons/design-view.svg"
+                },
+                "category": "Ballerina"
             }
         ],
         "views": {

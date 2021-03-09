@@ -68,7 +68,7 @@ function showDiagramEditor(context: ExtensionContext, langClient: ExtendedLangCl
 	diagramViewPanel = window.createWebviewPanel(
 		'ballerinaDiagram',
 		"Ballerina Diagram",
-		{ viewColumn: ViewColumn.Two, preserveFocus: true },
+		{ viewColumn: ViewColumn.One, preserveFocus: true },
 		getCommonWebViewOptions()
 	);
 
