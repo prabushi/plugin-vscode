@@ -25,7 +25,8 @@
     "activationEvents": [
         "onLanguage:ballerina",
         "onCommand:ballerina.showExamples",
-        "workspaceContains:Ballerina.toml"
+        "workspaceContains:Ballerina.toml",
+        "onView:ballerinaPackageTreeView"
     ],
     "contributes": {
         "languages": [
@@ -249,8 +250,33 @@
                 "command": "ballerina.project.add",
                 "title": "Add Module",
                 "category": "Ballerina"
+            },
+            {
+                "command": "ballerina.refreshProjectTree",
+                "title": "Refresh",
+                "icon": {
+                    "light": "./resources/images/icons/refresh.svg",
+                    "dark": "./resources/images/icons/refresh-inverse.svg"
+                }
             }
-        ]
+        ],
+        "views": {
+            "explorer": [
+                {
+                    "id": "ballerinaPackageTreeView",
+                    "name": "Ballerina Package Overview"
+                }
+            ]
+        },
+        "menus": {
+            "view/title": [
+                {
+                    "command": "ballerina.refreshProjectTree",
+                    "when": "view == ballerinaPackageTreeView",
+                    "group": "navigation"
+                }
+            ]
+        }
     },
     "main": "./dist/extension",
     "scripts": {

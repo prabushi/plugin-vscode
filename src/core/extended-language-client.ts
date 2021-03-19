@@ -83,10 +83,22 @@ export interface BallerinaProject {
     packageName?: string;
 }
 
+export interface BallerinaProjectComponents {
+    packages?: any[];
+}
+
 export interface GetBallerinaProjectParams {
     documentIdentifier: {
         uri: string;
     };
+}
+
+export interface GetBallerinaPackagesParams {
+    documentIdentifiers: DocumentIdentifier[];
+}
+
+export interface DocumentIdentifier {
+    uri: string;
 }
 
 export interface BallerinaAstOasChangeResponse {
@@ -126,6 +138,10 @@ export class ExtendedLangClient extends LanguageClient {
     }
 
     getBallerinaProject(params: GetBallerinaProjectParams): Thenable<BallerinaProject> {
-        return this.sendRequest("ballerinaDocument/project", params);
+        return this.sendRequest("ballerinaPackage/metadata", params);
+    }
+
+    getBallerinaProjectComponents(params: GetBallerinaPackagesParams): Thenable<BallerinaProjectComponents> {
+        return this.sendRequest("ballerinaPackage/components", params);
     }
 }
