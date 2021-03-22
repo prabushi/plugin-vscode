@@ -49,13 +49,12 @@ const PREV_REGEX = /1\.2\.[0-9]+/g;
 export const EXTENSION_ID = 'ballerina.ballerina';
 
 export interface ConstructIdentifier {
-    sourceRoot?: string;
-    filePath?: string;
-    moduleName: string;
-    constructName: string;
-    subConstructName?: string;
-    startLine?: number;
-    startColumn?: number;
+    filePath: string;
+    kind: string;
+    startLine: number;
+    startColumn: number;
+    endLine: number;
+    endColumn: number;
 }
 
 export class BallerinaExtension {
@@ -70,6 +69,7 @@ export class BallerinaExtension {
     public langClient?: ExtendedLangClient;
     public context?: ExtensionContext;
     private sdkVersion: StatusBarItem;
+    private packageTreeElementClickedCallbacks: Array<(construct: ConstructIdentifier) => void> = [];
 
     private webviewPanels: {
         [name: string]: WebviewPanel;
@@ -475,8 +475,18 @@ export class BallerinaExtension {
         return getOutputChannel();
     }
 
-    isTelemetryEnabled(): boolean {
+    public isTelemetryEnabled(): boolean {
         return <boolean>workspace.getConfiguration().get(ENABLE_TELEMETRY);
+    }
+
+    public packageTreeElementClicked(construct: ConstructIdentifier): void {
+        this.packageTreeElementClickedCallbacks.forEach((callback) => {
+            callback(construct);
+        });
+    }
+
+    public onPackageTreeElementClicked(callback: (construct: ConstructIdentifier) => void) {
+        this.packageTreeElementClickedCallbacks.push(callback);
     }
 }
 

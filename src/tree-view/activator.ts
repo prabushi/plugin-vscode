@@ -15,24 +15,59 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-import { BallerinaExtension } from "src/core";
-import { commands, window } from 'vscode';
+import { BallerinaExtension, ConstructIdentifier } from "../core";
+import { sendTelemetryEvent, CMP_PACKAGE_VIEW, TM_EVENT_OPEN_PACKAGE_OVERVIEW } from "../telemetry";
+import { commands, Range, TextDocumentShowOptions, Uri, ViewColumn, window } from 'vscode';
+import { PROJECT_KIND, TREE_ELEMENT_EXECUTE_COMMAND, TREE_REFRESH_COMMAND } from "./model";
 import { PackageOverviewDataProvider } from "./tree-data-provider";
 
 export function activate(ballerinaExtInstance: BallerinaExtension) {
 
+    sendTelemetryEvent(ballerinaExtInstance, TM_EVENT_OPEN_PACKAGE_OVERVIEW, CMP_PACKAGE_VIEW);
+
     const packageTreeDataProvider = new PackageOverviewDataProvider(ballerinaExtInstance);
-    const ballerinaProjectTree = window.createTreeView('ballerinaPackageTreeView', {
+    const ballerinaPackageTree = window.createTreeView('ballerinaPackageTreeView', {
         treeDataProvider: packageTreeDataProvider
     });
 
-    commands.registerCommand('ballerina.refreshProjectTree', () =>
+    commands.registerCommand(TREE_REFRESH_COMMAND, () =>
         packageTreeDataProvider.refresh()
     );
 
     packageTreeDataProvider.getPackageStructure().then(treeViewChildren => {
         if (treeViewChildren.length > 0) {
-            ballerinaProjectTree.reveal(treeViewChildren[0], { expand: true, focus: false, select: false });
+            ballerinaPackageTree.reveal(treeViewChildren[0], { expand: true, focus: false, select: false });
         }
     });
+
+    commands.registerCommand(TREE_ELEMENT_EXECUTE_COMMAND, (filePath: string, kind: string, startLine: number,
+        startColumn: number, endLine: number, endColumn: number) => {
+        ballerinaExtInstance.packageTreeElementClicked({
+            filePath,
+            kind,
+            startLine,
+            startColumn,
+            endLine,
+            endColumn
+        });
+    });
+
+    ballerinaExtInstance.onPackageTreeElementClicked((construct) => {
+        openBallerinaFile(construct);
+    });
+}
+
+function openBallerinaFile(construct: ConstructIdentifier) {
+    if (construct.filePath && (construct.kind === PROJECT_KIND.FUNCTION || construct.kind === PROJECT_KIND.RESOURCE)) {
+        const showOptions: TextDocumentShowOptions = {
+            preserveFocus: false,
+            preview: false,
+            viewColumn: ViewColumn.Active,
+            selection: new Range(construct.startLine!, construct.startColumn!, construct.startLine!, construct.startColumn!)
+        };
+        const status = commands.executeCommand('vscode.open', Uri.file(construct.filePath), showOptions);
+        if (!status) {
+            throw new Error(`Unable to open ${construct.filePath}`);
+        }
+    }
 }

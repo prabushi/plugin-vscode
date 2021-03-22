@@ -19,10 +19,11 @@ import { BallerinaExtension, DocumentIdentifier, ExtendedLangClient } from 'src/
 import {
     Event, EventEmitter, ProviderResult, TreeDataProvider, TreeItem, TreeItemCollapsibleState, Uri, window, workspace
 } from 'vscode';
-import { Module, ProjectTreeItem, Package, ChildrenData, PROJECT_KIND } from './model';
+import { Module, PackageTreeItem, Package, ChildrenData, PROJECT_KIND } from './model';
 import { dirname, join, parse } from 'path';
 import { existsSync, readdirSync } from 'fs';
 import { homedir } from 'os';
+import fileUriToPath = require('file-uri-to-path');
 
 const BAL_TOML = "Ballerina.toml";
 const BALLERINA = "ballerina";
@@ -30,7 +31,7 @@ const BALLERINA = "ballerina";
 /**
  * Data provider class for package tree.
  */
-export class PackageOverviewDataProvider implements TreeDataProvider<ProjectTreeItem> {
+export class PackageOverviewDataProvider implements TreeDataProvider<PackageTreeItem> {
     private langClient?: ExtendedLangClient;
     private ballerinaExtension: BallerinaExtension;
     private extensionPath: string;
@@ -55,29 +56,29 @@ export class PackageOverviewDataProvider implements TreeDataProvider<ProjectTree
             }
         });
     }
-    private _onDidChangeTreeData: EventEmitter<ProjectTreeItem | undefined> = new EventEmitter<ProjectTreeItem | undefined>();
-    readonly onDidChangeTreeData: Event<ProjectTreeItem | undefined> = this._onDidChangeTreeData.event;
+    private _onDidChangeTreeData: EventEmitter<PackageTreeItem | undefined> = new EventEmitter<PackageTreeItem | undefined>();
+    readonly onDidChangeTreeData: Event<PackageTreeItem | undefined> = this._onDidChangeTreeData.event;
 
     refresh(): void {
         this._onDidChangeTreeData.fire();
     }
 
-    getTreeItem(element: ProjectTreeItem): TreeItem | Thenable<TreeItem> {
+    getTreeItem(element: PackageTreeItem): TreeItem | Thenable<TreeItem> {
         return element;
     }
 
-    getParent?(element: ProjectTreeItem): ProviderResult<ProjectTreeItem> {
+    getParent?(element: PackageTreeItem): ProviderResult<PackageTreeItem> {
         return element.getParent();
     }
 
-    getChildren(element?: ProjectTreeItem): ProviderResult<ProjectTreeItem[]> {
+    getChildren(element?: PackageTreeItem): ProviderResult<PackageTreeItem[]> {
         if (!element) {
             return this.getPackageStructure();
-        } else if (element.kind === PROJECT_KIND.PACKAGE) {
+        } else if (element.getKind() === PROJECT_KIND.PACKAGE) {
             return this.getModuleStructure(element);
-        } else if (element.kind === PROJECT_KIND.MODULE) {
+        } else if (element.getKind() === PROJECT_KIND.MODULE) {
             return this.getComponentStructure(element);
-        } else if (element.kind === PROJECT_KIND.SERVICE) {
+        } else if (element.getKind() === PROJECT_KIND.SERVICE) {
             return this.getResourceStructure(element);
         }
     }
@@ -86,14 +87,14 @@ export class PackageOverviewDataProvider implements TreeDataProvider<ProjectTree
      * Returns the tree structure for packages.
      * @returns An array of tree nodes with package data.
      */
-    public getPackageStructure(): Promise<ProjectTreeItem[]> {
-        return new Promise<ProjectTreeItem[]>((resolve) => {
+    public getPackageStructure(): Promise<PackageTreeItem[]> {
+        return new Promise<PackageTreeItem[]>((resolve) => {
             this.getPackageList().then(documentIdentifiers => {
                 if (documentIdentifiers.length > 0) {
                     this.ballerinaExtension.onReady().then(() => {
                         this.langClient!.getBallerinaProjectComponents({ documentIdentifiers }).then((response) => {
                             if (response.packages) {
-                                const projectItems: ProjectTreeItem[] = this.createPackageData(response.packages);
+                                const projectItems: PackageTreeItem[] = this.createPackageData(response.packages);
                                 resolve(projectItems);
                             }
                         });
@@ -109,9 +110,9 @@ export class PackageOverviewDataProvider implements TreeDataProvider<ProjectTree
      * Returns the tree structure for functions and services.
      * @returns An array of tree nodes with module component data.
      */
-    private getComponentStructure(parent: ProjectTreeItem, isDefaultModule: boolean = false,
-        childrenData: ChildrenData = {}): ProjectTreeItem[] {
-        let components: ProjectTreeItem[] = [];
+    private getComponentStructure(parent: PackageTreeItem, isDefaultModule: boolean = false,
+        childrenData: ChildrenData = {}): PackageTreeItem[] {
+        let components: PackageTreeItem[] = [];
         const children: ChildrenData = isDefaultModule ? childrenData : parent.getChildrenData();
         //Process function nodes
         if (children.functions) {
@@ -120,9 +121,9 @@ export class PackageOverviewDataProvider implements TreeDataProvider<ProjectTree
                 return fn1.name!.localeCompare(fn2.name!);
             });
             functionNodes.forEach(fn => {
-                components.push(new ProjectTreeItem(fn.name, `${fn.filePath}`, TreeItemCollapsibleState.None,
-                    PROJECT_KIND.FUNCTION, join(parent.getFilePath(), fn.filePath), this.extensionPath, true,
-                    parent, {}, fn.startLine, fn.startColumn, fn.endLine, fn.endColumn));
+                components.push(new PackageTreeItem(fn.name, `${fn.filePath}`, TreeItemCollapsibleState.None,
+                    PROJECT_KIND.FUNCTION, join(parent.getFilePath(), fn.filePath), this.extensionPath, true, parent,
+                    {}, fn.startLine, fn.startColumn, fn.endLine, fn.endColumn));
             });
         }
 
@@ -135,7 +136,7 @@ export class PackageOverviewDataProvider implements TreeDataProvider<ProjectTree
                 return service1.name!.localeCompare(service2.name!);
             });
             serviceNodes.forEach(service => {
-                components.push(new ProjectTreeItem(service.name, `${service.filePath}`,
+                components.push(new PackageTreeItem(service.name, `${service.filePath}`,
                     TreeItemCollapsibleState.Collapsed, PROJECT_KIND.SERVICE, join(parent.getFilePath(),
                         service.filePath), this.extensionPath, true, parent, { resources: service.resources },
                     service.startLine, service.startColumn, service.endLine, service.endColumn));
@@ -146,7 +147,7 @@ export class PackageOverviewDataProvider implements TreeDataProvider<ProjectTree
             });
             let count: number = 0;
             serviceNodesWithoutName.forEach(service => {
-                components.push(new ProjectTreeItem(`${PROJECT_KIND.SERVICE} ${++count}`, `${service.filePath}`,
+                components.push(new PackageTreeItem(`${PROJECT_KIND.SERVICE} ${++count}`, `${service.filePath}`,
                     TreeItemCollapsibleState.Collapsed, PROJECT_KIND.SERVICE, join(parent.getFilePath(),
                         service.filePath), this.extensionPath, true, parent, { resources: service.resources },
                     service.startLine, service.startColumn, service.endLine, service.endColumn));
@@ -155,15 +156,15 @@ export class PackageOverviewDataProvider implements TreeDataProvider<ProjectTree
         return components;
     }
 
-    private createPackageData(packages: Package[]): ProjectTreeItem[] {
-        let packageItems: ProjectTreeItem[] = [];
+    private createPackageData(packages: Package[]): PackageTreeItem[] {
+        let packageItems: PackageTreeItem[] = [];
         packages.sort((package1, package2) => {
             return package1.name.localeCompare(package2.name!);
         });
         packages.forEach(projectPackage => {
             if (projectPackage.name) {
-                packageItems.push(new ProjectTreeItem(projectPackage.name, '',
-                    TreeItemCollapsibleState.Collapsed, PROJECT_KIND.PACKAGE, projectPackage.filePath,
+                packageItems.push(new PackageTreeItem(projectPackage.name, '',
+                    TreeItemCollapsibleState.Collapsed, PROJECT_KIND.PACKAGE, fileUriToPath(projectPackage.filePath),
                     this.extensionPath, true, null, { modules: projectPackage.modules }));
             }
         });
@@ -174,14 +175,14 @@ export class PackageOverviewDataProvider implements TreeDataProvider<ProjectTree
      * Returns the tree structure for modules.
      * @returns An array of tree nodes with module data.
      */
-    private getModuleStructure(parent: ProjectTreeItem): ProjectTreeItem[] {
-        let moduleItems: ProjectTreeItem[] = [];
+    private getModuleStructure(parent: PackageTreeItem): PackageTreeItem[] {
+        let moduleItems: PackageTreeItem[] = [];
         if (parent.getChildrenData().modules) {
             const defaultModules: Module[] = parent.getChildrenData().modules!.filter(module => {
                 return !module.name;
             });
             if (defaultModules.length === 1) {
-                const defaultModuleItems: ProjectTreeItem[] = this.getComponentStructure(parent, true,
+                const defaultModuleItems: PackageTreeItem[] = this.getComponentStructure(parent, true,
                     { functions: defaultModules[0].functions, services: defaultModules[0].services });
                 if (defaultModuleItems.length > 0) {
                     moduleItems = moduleItems.concat(defaultModuleItems);
@@ -195,8 +196,8 @@ export class PackageOverviewDataProvider implements TreeDataProvider<ProjectTree
                 return mod1.name!.localeCompare(mod2.name!);
             });
             nonDefaultModules.forEach(module => {
-                moduleItems.push(new ProjectTreeItem(module.name!, '',
-                    TreeItemCollapsibleState.Collapsed, PROJECT_KIND.MODULE, join(parent.getFilePath(),
+                moduleItems.push(new PackageTreeItem(module.name!, '',
+                    TreeItemCollapsibleState.Collapsed, PROJECT_KIND.MODULE, join(parent.getFilePath(), 'modules',
                         module.name!), this.extensionPath, false, parent,
                     {
                         functions: module.functions,
@@ -211,8 +212,8 @@ export class PackageOverviewDataProvider implements TreeDataProvider<ProjectTree
       * Returns the tree structure for resources.
       * @returns An array of tree nodes with resource data.
       */
-    private getResourceStructure(parent: ProjectTreeItem): ProjectTreeItem[] {
-        let resources: ProjectTreeItem[] = [];
+    private getResourceStructure(parent: PackageTreeItem): PackageTreeItem[] {
+        let resources: PackageTreeItem[] = [];
         const children: ChildrenData = parent.getChildrenData();
         if (children.resources) {
             const resourceNodes = children.resources;
@@ -220,7 +221,7 @@ export class PackageOverviewDataProvider implements TreeDataProvider<ProjectTree
                 return resource1.name!.localeCompare(resource2.name!);
             });
             resourceNodes.forEach(resource => {
-                resources.push(new ProjectTreeItem(resource.name, '',
+                resources.push(new PackageTreeItem(resource.name, '',
                     TreeItemCollapsibleState.None, PROJECT_KIND.RESOURCE, parent.getFilePath(), this.extensionPath, true,
                     parent, {}, resource.startLine, resource.startColumn, resource.endLine, resource.endColumn));
             });

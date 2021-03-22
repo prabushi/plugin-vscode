@@ -26,14 +26,17 @@ export enum PROJECT_KIND {
     RESOURCE = "resource"
 }
 
-export class ProjectTreeItem extends TreeItem {
-    public kind: string;
+export const TREE_ELEMENT_EXECUTE_COMMAND: string = 'ballerina.executeTreeElement';
+export const TREE_REFRESH_COMMAND: string = 'ballerina.refreshPackageTree';
+
+export class PackageTreeItem extends TreeItem {
+    private kind: string;
     private filePath: string;
     private extensionPath: string;
-    private parent: ProjectTreeItem | null;
+    private parent: PackageTreeItem | null;
     private childrenData: ChildrenData;
     private startLine: number;
-    private startCloumn: number;
+    private startColumn: number;
     private endLine: number;
     private endColumn: number;
     constructor(
@@ -44,15 +47,15 @@ export class ProjectTreeItem extends TreeItem {
         filePath: string,
         extensionPath: string,
         hasIcon: boolean,
-        parent: ProjectTreeItem | null,
+        parent: PackageTreeItem | null,
         childrenData: ChildrenData,
         startLine: number = -1,
-        startCloumn: number = -1,
+        startColumn: number = -1,
         endLine: number = -1,
         endColumn: number = -1
     ) {
         super(label, collapsibleState);
-        this.tooltip = `${this.label}-${this.version}`;
+        this.tooltip = `${this.label} ${kind}`;
         this.description = this.version;
         this.kind = kind;
         this.filePath = filePath;
@@ -60,7 +63,7 @@ export class ProjectTreeItem extends TreeItem {
         this.childrenData = childrenData;
         this.parent = parent;
         this.startLine = startLine;
-        this.startCloumn = startCloumn;
+        this.startColumn = startColumn;
         this.endLine = endLine;
         this.endColumn = endColumn;
         if (hasIcon) {
@@ -69,9 +72,22 @@ export class ProjectTreeItem extends TreeItem {
                 dark: join(this.extensionPath, 'resources', 'images', 'icons', `${kind.toLowerCase()}-inverse.svg`)
             };
         }
+
+        this.command = {
+            command: TREE_ELEMENT_EXECUTE_COMMAND,
+            title: "Execute Tree Command",
+            arguments: [
+                this.filePath,
+                this.kind,
+                this.startLine,
+                this.startColumn,
+                this.endLine,
+                this.endColumn
+            ]
+        };
     }
 
-    getParent(): ProjectTreeItem | null {
+    getParent(): PackageTreeItem | null {
         return this.parent;
     }
 
@@ -92,7 +108,7 @@ export class ProjectTreeItem extends TreeItem {
     }
 
     getStartColumn() {
-        return this.startCloumn;
+        return this.startColumn;
     }
 
     getEndLine() {
@@ -101,6 +117,10 @@ export class ProjectTreeItem extends TreeItem {
 
     getEndColumn() {
         return this.endColumn;
+    }
+
+    getKind() {
+        return this.kind;
     }
 }
 

@@ -10,3 +10,4 @@ export const CMP_PROJECT_ADD = "component.project.add.runner";
 export const CMP_PROJECT_CLOUD = "component.project.cloud.runner";
 export const CMP_TRACE_LOGS = "component.trace.logs";
 export const CMP_DEBUGGER = "component.debugger";
+export const CMP_PACKAGE_VIEW = "component.package.view";
