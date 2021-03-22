@@ -1,12 +1,12 @@
 import { Uri } from 'vscode';
 import { getLibraryWebViewContent, WebViewOptions, getComposerWebViewOptions } from '../utils';
 
-export function render (docUri: Uri)
+export function render (filePath: Uri, startLine: number, startColumn: number, endLine: number, endColumn: number)
         : string {       
-   return renderDiagram(docUri);
+   return renderDiagram(filePath, startLine, startColumn, endLine, endColumn);
 }
 
-function renderDiagram(docUri: Uri): string {
+function renderDiagram(filePath: Uri,  startLine: number, startColumn: number, endLine: number, endColumn: number): string {
 
     const body = `
         <div id="warning"></div>
@@ -57,7 +57,11 @@ function renderDiagram(docUri: Uri): string {
     const scripts = `
         function loadedScript() {
             window.langclient = getLangClient();
-            let docUri = ${JSON.stringify(docUri.toString())};
+            let filePath = ${JSON.stringify(filePath.toString())};
+            let startLine = ${JSON.stringify(startLine.toString())};
+            let startColumn = ${JSON.stringify(startColumn.toString())};
+            let endLine = ${JSON.stringify(endLine.toString())};
+            let endColumn = ${JSON.stringify(endColumn.toString())};
             function drawDiagram() {
                 try {
                     let width = window.innerWidth - 6;
@@ -66,11 +70,12 @@ function renderDiagram(docUri: Uri): string {
                     const options = {
                         target: document.getElementById("diagram"),
                         editorProps: {
-                            docUri,
-                            width,
-                            height,
-                            zoom,
-                            langClient: getLangClient()
+                            langClient: getLangClient(),
+                            filePath,
+                            startLine,
+                            startColumn,
+                            endLine,
+                            endColumn
                         }
                     };
                     const diagram = ballerinaComposer.renderDiagramEditor(options);
@@ -88,11 +93,6 @@ function renderDiagram(docUri: Uri): string {
                 <div id="errors">
                     <span>\$\{message\}</span>
                 </div>
-                \`;
-            }
-            function showWarning(message) {
-                document.getElementById("warning").innerHTML = \`
-                    <p><span class="fw fw-warning"></span> \$\{message\}</p>
                 \`;
             }
             drawDiagram();

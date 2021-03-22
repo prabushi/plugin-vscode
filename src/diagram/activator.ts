@@ -38,7 +38,8 @@ function updateWebView(docUri: Uri): void {
 	}
 }
 
-function showDiagramEditor(context: ExtensionContext, langClient: ExtendedLangClient): void {
+function showDiagramEditor(context: ExtensionContext, langClient: ExtendedLangClient, startLine: number,
+	startColumn: number, endLine: number, endColumn: number): void {
 	const didChangeDisposable = workspace.onDidChangeTextDocument(
 		_.debounce((e: TextDocumentChangeEvent) => {
 			if (activeEditor && (e.document === activeEditor.document) &&
@@ -83,7 +84,7 @@ function showDiagramEditor(context: ExtensionContext, langClient: ExtendedLangCl
 	}
 	activeEditor = editor;
 	rpcHandler = WebViewRPCHandler.create(diagramViewPanel, langClient);
-	const html = render(editor.document.uri);
+	const html = render(editor.document.uri, startLine, startColumn, endLine, endColumn);
 	if (diagramViewPanel && html) {
 		diagramViewPanel.webview.html = html;
 	}
@@ -110,7 +111,7 @@ export function activate(ballerinaExtInstance: BallerinaExtension) {
 					ballerinaExtInstance.showMessageServerMissingCapability();
 					return {};
 				}
-				showDiagramEditor(context, langClient);
+				showDiagramEditor(context, langClient, 10, 20, 30, 40);
 			})
 			.catch((e) => {
 				ballerinaExtInstance.showPluginActivationError();

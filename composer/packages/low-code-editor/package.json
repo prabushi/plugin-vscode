@@ -1,7 +1,7 @@
 {
-  "name": "@ballerina/ballerina-by-examples",
-  "version": "2.0.0-beta1-SNAPSHOT",
-  "description": "Provides components for displaying Ballerina By Examples",
+  "name": "@ballerina/low-code-editor",
+  "version": "2.0.0-alpha3-SNAPSHOT",
+  "description": "Provides components for displaying Ballerina Low Code Editor",
   "main": "lib/src/index.js",
   "scripts": {
     "prepublishOnly": "npm run build",
@@ -15,12 +15,8 @@
     "watch:test": "composer pkg:test:watch",
     "storybook": "composer pkg:storybook"
   },
-  "dependencies": {
-    "lodash": "^4.17.11"
-  },
   "devDependencies": {
-    "@ballerina/composer-cli": "^2.0.0-beta1-SNAPSHOT",
-    "@types/lodash": "^4.14.118"
+    "@ballerina/composer-cli": "^2.0.0-alpha3-SNAPSHOT"
   },
   "author": "ballerina.io",
   "license": "Apache-2.0"

@@ -18,6 +18,7 @@
     "@ballerina/ballerina-by-examples": "^2.0.0-beta1-SNAPSHOT",
     "@ballerina/documentation": "^2.0.0-beta1-SNAPSHOT",
     "@ballerina/font": "^2.0.0-beta1-SNAPSHOT",
+    "@ballerina/low-code-editor": "^2.0.0-beta1-SNAPSHOT",
     "@ballerina/theme": "^2.0.0-beta1-SNAPSHOT"
   },
   "devDependencies": {
