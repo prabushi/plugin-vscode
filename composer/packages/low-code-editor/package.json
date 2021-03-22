@@ -1,6 +1,6 @@
 {
   "name": "@ballerina/low-code-editor",
-  "version": "2.0.0-alpha3-SNAPSHOT",
+  "version": "2.0.0-beta1-SNAPSHOT",
   "description": "Provides components for displaying Ballerina Low Code Editor",
   "main": "lib/src/index.js",
   "scripts": {
@@ -16,7 +16,7 @@
     "storybook": "composer pkg:storybook"
   },
   "devDependencies": {
-    "@ballerina/composer-cli": "^2.0.0-alpha3-SNAPSHOT"
+    "@ballerina/composer-cli": "^2.0.0-beta1-SNAPSHOT"
   },
   "author": "ballerina.io",
   "license": "Apache-2.0"

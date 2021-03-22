@@ -38,8 +38,8 @@ function updateWebView(docUri: Uri): void {
 	}
 }
 
-function showDiagramEditor(context: ExtensionContext, langClient: ExtendedLangClient, startLine: number,
-	startColumn: number, endLine: number, endColumn: number): void {
+export function showDiagramEditor(context: ExtensionContext, langClient: ExtendedLangClient, startLine: number,
+	startColumn: number, endLine: number, endColumn: number, filePath: string = ''): void {
 	const didChangeDisposable = workspace.onDidChangeTextDocument(
 		_.debounce((e: TextDocumentChangeEvent) => {
 			if (activeEditor && (e.document === activeEditor.document) &&
@@ -62,8 +62,9 @@ function showDiagramEditor(context: ExtensionContext, langClient: ExtendedLangCl
 		});
 
 	if (diagramViewPanel) {
-		diagramViewPanel.reveal(ViewColumn.Two, true);
-		return;
+		diagramViewPanel.dispose();
+		// diagramViewPanel.reveal(ViewColumn.Two, true);
+		// return;
 	}
 	// Create and show a new webview
 	diagramViewPanel = window.createWebviewPanel(
@@ -79,12 +80,14 @@ function showDiagramEditor(context: ExtensionContext, langClient: ExtendedLangCl
 	};
 
 	const editor = window.activeTextEditor;
-	if (!editor) {
-		return;
-	}
+	// if (!editor) {
+	// 	return;
+	// }
 	activeEditor = editor;
 	rpcHandler = WebViewRPCHandler.create(diagramViewPanel, langClient);
-	const html = render(editor.document.uri, startLine, startColumn, endLine, endColumn);
+	let treeItemPath: Uri;
+	filePath === '' && editor ? treeItemPath = editor.document.uri : treeItemPath = Uri.file(filePath);
+	const html = render(treeItemPath, startLine, startColumn, endLine, endColumn);
 	if (diagramViewPanel && html) {
 		diagramViewPanel.webview.html = html;
 	}
